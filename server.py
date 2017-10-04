@@ -2,7 +2,7 @@ from flask import render_template, request, redirect
 from flask_security import Security, logout_user, login_required
 from flask_security.utils import encrypt_password, verify_password
 from flask_restless import APIManager
-from flask_jwt import JWT, jwt_required
+from flask_jwt import JWT, jwt_required, current_identity
 
 from database import db
 from application import app
@@ -32,6 +32,7 @@ def log_out():
 
 # JWT Token authentication  ===================================================
 def authenticate(username, password):
+    print(username, password)
     user = user_datastore.find_user(email=username)
     if user and username == user.email and verify_password(password, user.password):
         return user
@@ -39,6 +40,7 @@ def authenticate(username, password):
 
 
 def load_user(payload):
+    print(payload)
     user = user_datastore.find_user(id=payload['identity'])
     return user
 
@@ -50,17 +52,28 @@ jwt = JWT(app, authenticate, load_user)
 def auth_func(**kw):
     pass
 
+def dumb_prefunc(**kw):
+    print("dumb prefunc keywords:", kw)
+    print("prefunc identity: ", current_identity)
+
+def dumb_postfunc(**kw):
+    print("dumb postfunc keywords:", kw)
+    print("postfunc identity: ", current_identity)
+
+pp=[dumb_prefunc, auth_func, dumb_postfunc]
 
 apimanager = APIManager(app, flask_sqlalchemy_db=db)
-apimanager.create_api(SomeStuff,
+apimanager.create_api(
+    SomeStuff,
     methods=['GET', 'POST', 'DELETE', 'PUT'],
     url_prefix='/api/v1',
     collection_name='free_stuff',
     include_columns=['id', 'data1', 'data2', 'user_id'])
-apimanager.create_api(SomeStuff,
+apimanager.create_api(
+    SomeStuff,
     methods=['GET', 'POST', 'DELETE', 'PUT'],
     url_prefix='/api/v1',
-    preprocessors=dict(GET_SINGLE=[auth_func], GET_MANY=[auth_func]),
+    preprocessors=dict(GET_SINGLE=pp, GET_MANY=pp, POST=pp),
     collection_name='protected_stuff',
     include_columns=['id', 'data1', 'data2', 'user_id'])
 
