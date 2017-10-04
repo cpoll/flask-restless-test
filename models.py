@@ -1,5 +1,8 @@
 from database import db
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import validates
 from flask_security import UserMixin, RoleMixin, SQLAlchemyUserDatastore
+from flask_jwt import current_identity
 
 roles_users = db.Table('roles_users',
                        db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
@@ -39,3 +42,13 @@ class SomeStuff(db.Model):
     data2 = db.Column(db.String(10))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     user = db.relationship(User, lazy='joined', join_depth=1, viewonly=True)
+
+    @validates('data1')
+    def validate_data1(self, key, data1):
+        print("posting with identity: ", current_identity)
+        print(data1)
+        return data1
+
+    # @hybrid_property
+    # def thing(self):
+    #     return 5

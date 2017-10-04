@@ -75,7 +75,7 @@ apimanager.create_api(
     url_prefix='/api/v1',
     preprocessors=dict(GET_SINGLE=pp, GET_MANY=pp, POST=pp),
     collection_name='protected_stuff',
-    include_columns=['id', 'data1', 'data2', 'user_id'])
+    include_columns=['id', 'data1', 'data2', 'user_id', 'thing'])
 
 
 # Setup Admin  ================================================================

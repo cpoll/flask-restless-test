@@ -23,6 +23,26 @@ Setup
 - Run `pip install -r requirements.txt`
 - Start server using `python server.py`
 
+## REST-based approach
+### Registration:
+Easier to do from the GUI for now, until I remove the CSRF token
+Although eventually I will want the CSRF token...
+
+### POST {{url}}/api/v1/auth 
+BODY: 
+{
+	"username":"a@a.com",
+	"password":"abcdef"
+}
+RETURNS:
+{
+    "access_token": {{token}}
+}
+
+### GET/POST {{url}}/api/v1/protected_stuff
+Headers: {Authorization: JWT {{token}}}
+BODY: Varies
+
 **Website**
 
 - Access site at /. Not much there, just a basic example for logging in
